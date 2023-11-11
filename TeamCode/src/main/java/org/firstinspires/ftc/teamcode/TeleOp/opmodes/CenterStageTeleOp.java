@@ -81,16 +81,18 @@ public class CenterStageTeleOp extends OpMode {
         drive.update();
 
         poseEstimate = drive.getPoseEstimate();
+        /*
         if (gamepad2.a) {
             lift.setHeightAsync(DistanceUnit.INCH, 10);
         } else if (gamepad2.b) {
             lift.setHeightAsync(DistanceUnit.INCH, 0);
         }
+         */
 
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate);
 
-        //lift.left.setPower(-gamepad2.left_stick_y);
-        //lift.right.setPower(-gamepad2.right_stick_y);
+        lift.left.setPower(-gamepad2.left_stick_y);
+        lift.right.setPower(-gamepad2.right_stick_y);
 
 
 
