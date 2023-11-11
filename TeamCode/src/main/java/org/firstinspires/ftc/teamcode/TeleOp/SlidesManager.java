@@ -1,33 +1,37 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 
 @Config
 public class SlidesManager {
     public DcMotorEx left;
     public DcMotorEx right;
 
-    public static double Kp = 1.0;
-    public static double Ki = 0.0;
-    public static double Kd = 0.0;
+    public static double Kp = 3.2;
+    public static double Ki = 0.05;
+    public static double Kd = 0.8;
 
-    PIDFCoefficients PID = new PIDFCoefficients(Kp, Ki, Kd, 0.0);
+    PIDCoefficients pidCoefficients = new PIDCoefficients(Kp, Ki, Kd);
     boolean REVERSE = false;
-    public double speed;
-
     public double maxHeight = 700.0;
 
     double pulley_diameter = 38.2;
     double counts_per_rev = 384.5;
-    private double threshold = 0.01;
+
+    PIDFController rightPID = new PIDFController(pidCoefficients);
+    PIDFController leftPID = new PIDFController(pidCoefficients);
+
+
 
     public SlidesManager(DcMotorEx l, DcMotorEx r){
         this.left = l;
@@ -98,17 +102,11 @@ public class SlidesManager {
     }
 
     private double toLength(DistanceUnit distanceUnit, int ticks){
-        return distanceUnit.fromMm(Math.floor(ticks * (pulley_diameter * Math.PI / counts_per_rev)));
+        return distanceUnit.fromMm(ticks * (pulley_diameter * Math.PI / counts_per_rev));
     }
 
-    public void setPID(PIDFCoefficients PID) {
-        this.PID = PID;
-    }
-    public void setThreshold(double t){
-        this.threshold = t;
-    }
-    public void setThreshold(DistanceUnit distanceUnit, double t){
-        this.setThreshold(distanceUnit.toMm(t) / maxHeight);
+    public void setPidfCoefficients(PIDCoefficients pidCoefficients) {
+        this.pidCoefficients = pidCoefficients;
     }
 
     public void zeroEncoders(){
@@ -119,25 +117,18 @@ public class SlidesManager {
     }
     public void setHeightAsync(DistanceUnit distanceUnit, double height){
 
-
-
-
         double heightPercent = distanceUnit.toMm(height) / distanceUnit.fromMm(maxHeight);
 
         double leftPercent = toLength(distanceUnit, left.getCurrentPosition()) / distanceUnit.fromMm(maxHeight);
 
         double rightPercent = toLength(distanceUnit, right.getCurrentPosition()) / distanceUnit.fromMm(maxHeight);
 
-        PIDController leftPID = new PIDController(PID.p, PID.i, PID.d);
-        leftPID.threshold = threshold;
+        leftPID.setTargetPosition(heightPercent);
+        rightPID.setTargetPosition(heightPercent);
 
+        double leftPower = leftPID.update(leftPercent);
 
-        double leftPower = leftPID.update(heightPercent, leftPercent);
-
-        PIDController rightPID = new PIDController(PID.p, PID.i, PID.d);
-        rightPID.threshold = threshold;
-
-        double rightPower = rightPID.update(heightPercent, rightPercent);
+        double rightPower = rightPID.update(rightPercent);
 
         left.setPower(leftPower);
         right.setPower(rightPower);
@@ -151,6 +142,10 @@ public class SlidesManager {
         telemetry.addData("r:", (pulley_diameter * Math.PI / counts_per_rev) * (right.getCurrentPosition()));
     }
 
+    public void stop(){
+        left.setPower(0);
+        right.setPower(0);
+    }
 
 
 

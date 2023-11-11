@@ -1,12 +1,13 @@
 package org.firstinspires.ftc.teamcode.TeleOp.opmodes;
 
-import android.transition.Slide;
 
+
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.TeleOp.FieldRelativeControls;
@@ -20,6 +21,7 @@ import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 //////////////////////////////////////////////////////////////////////////////
 
 @TeleOp
+@Config
 public class CenterStageTeleOp extends OpMode {
 
     //////////////////////////////////////////////////////////////////////////////
@@ -28,17 +30,18 @@ public class CenterStageTeleOp extends OpMode {
 
     MecanumDrive drive;
     Pose2d poseEstimate;
-
     DcMotorEx left;
     DcMotorEx right;
     SlidesManager lift;
-
-
-
-
-
     FieldRelativeControls stick = new FieldRelativeControls();
 
+    Servo launcher;
+
+    public static double position1 = 400; // in mm
+    public static double position2 = 0; // in mm
+
+    public static double thresh = 10.0;// in mm again
+    boolean goToTop = false;
 
     //////////////////////////////////////////////////////////////////////////////
     //TeleOp functions
@@ -49,11 +52,13 @@ public class CenterStageTeleOp extends OpMode {
     public void init() {
         drive = new MecanumDrive(hardwareMap);
 
+        launcher = hardwareMap.get(Servo.class, "launcher");
+        launcher.setDirection(Servo.Direction.FORWARD);
+
         right = hardwareMap.get(DcMotorEx.class, "right");
         left = hardwareMap.get(DcMotorEx.class, "left");
 
         lift = new SlidesManager(left, right, 700);
-        lift.setThreshold(DistanceUnit.MM, 6.0);
 
 
         movementInit();
@@ -64,6 +69,7 @@ public class CenterStageTeleOp extends OpMode {
      */
     public void movementInit(){
 
+        launcher.setPosition(1.0);
     }
 
     //code to run repeatedly once driver hits init, before driver hits play
@@ -81,18 +87,33 @@ public class CenterStageTeleOp extends OpMode {
         drive.update();
 
         poseEstimate = drive.getPoseEstimate();
-        /*
+
+
         if (gamepad2.a) {
-            lift.setHeightAsync(DistanceUnit.INCH, 10);
+            goToTop = true;
         } else if (gamepad2.b) {
-            lift.setHeightAsync(DistanceUnit.INCH, 0);
+            goToTop = false;
+        } else {
+            //lift.stop();
         }
-         */
+        if (goToTop){
+            lift.setHeightAsync(DistanceUnit.MM, position1);
+        } else{
+            lift.setHeightAsync(DistanceUnit.MM, position2);
+        }
+
+
+        if (gamepad2.right_trigger != 0){
+            launcher.setPosition(0.5);
+        } else{
+            launcher.setPosition(1.0);
+        }
+
 
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate);
 
-        lift.left.setPower(-gamepad2.left_stick_y);
-        lift.right.setPower(-gamepad2.right_stick_y);
+        //lift.left.setPower(-gamepad2.left_stick_y);
+        //lift.right.setPower(-gamepad2.right_stick_y);
 
 
 
@@ -107,6 +128,7 @@ public class CenterStageTeleOp extends OpMode {
     public void stop(){
         drive.update();
         PoseStorage.storedPose = drive.getPoseEstimate();
+
     }
 
     public void driveTelemetry(){
