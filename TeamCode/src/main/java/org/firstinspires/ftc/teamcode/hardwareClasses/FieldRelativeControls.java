@@ -11,7 +11,7 @@ public class FieldRelativeControls {
         Vector2d input = new Vector2d(
                 -gamepad1.left_stick_y,
                 -gamepad1.left_stick_x
-        );//.rotated(-poseEstimate.getHeading());
+        ).rotated(-poseEstimate.getHeading());
 
 
         drive.setWeightedDrivePower(

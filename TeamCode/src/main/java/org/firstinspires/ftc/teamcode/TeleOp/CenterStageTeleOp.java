@@ -9,7 +9,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.hardwareClasses.ArmAndWristManager;
+import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
 import org.firstinspires.ftc.teamcode.hardwareClasses.PoseStorage;
@@ -30,12 +33,14 @@ public class CenterStageTeleOp extends OpMode {
 
     MecanumDrive drive;
     Pose2d poseEstimate;
-    DcMotorEx left;
-    DcMotorEx right;
     SlidesManager lift;
     FieldRelativeControls stick = new FieldRelativeControls();
 
     Servo launcher;
+
+    ArmAndWristManager arm;
+
+    ClawManager claw;
 
 
 
@@ -57,11 +62,10 @@ public class CenterStageTeleOp extends OpMode {
         launcher = hardwareMap.get(Servo.class, "launcher");
         launcher.setDirection(Servo.Direction.FORWARD);
 
-        right = hardwareMap.get(DcMotorEx.class, "right");
-        left = hardwareMap.get(DcMotorEx.class, "left");
+        lift = new SlidesManager(hardwareMap);
 
-        lift = new SlidesManager(left, right, 700);
-
+        arm = new ArmAndWristManager(hardwareMap);
+        claw = new ClawManager(hardwareMap);
 
         movementInit();
     }
@@ -71,6 +75,7 @@ public class CenterStageTeleOp extends OpMode {
      */
     public void movementInit(){
 
+        claw.setMiddle();
         launcher.setPosition(1.0);
     }
 
@@ -99,10 +104,11 @@ public class CenterStageTeleOp extends OpMode {
             //lift.stop();
         }
         if (goToTop){
-            lift.setHeightAsync(DistanceUnit.MM, position1);
+            //lift.setHeightAsync(DistanceUnit.MM, position1);
         } else{
-            lift.setHeightAsync(DistanceUnit.MM, position2);
+            //lift.setHeightAsync(DistanceUnit.MM, position2);
         }
+        arm.armAngle = (-gamepad2.left_stick_y + 1) / 2 * arm.getAngleRange();
 
 
         if (gamepad2.right_trigger != 0){
@@ -110,24 +116,41 @@ public class CenterStageTeleOp extends OpMode {
         } else{
             launcher.setPosition(1.0);
         }
+        /*
+        if (gamepad2.y){
+            claw.setCosmetic();
+        } else if (gamepad2.left_trigger != 0){
+            claw.open(ClawManager.CLAWS.INNER);
+        } else if (gamepad2.left_bumper) {
+            claw.open(ClawManager.CLAWS.OUTER);
+        } else if (gamepad2.x){
+            claw.close();
+        }
+        */
 
-
+        arm.update();
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate);
+
 
         //lift.left.setPower(-gamepad2.left_stick_y);
         //lift.right.setPower(-gamepad2.right_stick_y);
 
 
-
-
+        arm.doTelemetry(telemetry);
+        claw.doTelemetry(telemetry);
         driveTelemetry();
         lift.doTelemetry(telemetry);
         telemetry.update();
     }
 
+    public void stopMovement(){
+
+    }
+
     //code to run once driver hits stop
     @Override
     public void stop(){
+        stopMovement();
         drive.update();
         PoseStorage.storedPose = drive.getPoseEstimate();
 

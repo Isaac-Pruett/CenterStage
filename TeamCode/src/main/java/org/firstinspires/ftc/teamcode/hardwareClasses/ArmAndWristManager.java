@@ -3,9 +3,10 @@ package org.firstinspires.ftc.teamcode.hardwareClasses;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class ArmAndWristManager {
+public class ArmAndWristManager implements subsystem {
     Servo armLeft;
     Servo armRight;
     Servo wrist;
@@ -16,14 +17,10 @@ public class ArmAndWristManager {
 
     private double NomalizeTo90Const = (angleRange/2) - 90; // in degrees
 
-
     boolean lockedAt0 = false;
     boolean lockedAt30 = false;
-    double armAngle = 0;
-    double wristAngle = 0;
-
-    double WristOffsetFromZero = 30.0; // estimate for now, in degrees
-
+    public double armAngle = 0;
+    public double wristAngle = 0;
 
     public ArmAndWristManager(HardwareMap hwmp){
         armLeft = hwmp.get(Servo.class, "armLeft");
@@ -66,19 +63,17 @@ public class ArmAndWristManager {
     }
 
 
+
     public void setHeight(DistanceUnit distanceUnit, double height){
         armAngle = Math.toDegrees(Math.asin(distanceUnit.toInches(height)/armLength));
     }
-
     public void setArmAngle(double degrees){
         armRight.setPosition(toServoInput(degrees));
         armLeft.setPosition(toServoInput(degrees));
     }
-
     public void setWristAngle(double degrees){
         wrist.setPosition(toServoInput(degrees));
     }
-
     public void setDirections(Servo.Direction dir){
         if (dir == Servo.Direction.FORWARD){
             armLeft.setDirection(Servo.Direction.REVERSE);
@@ -88,12 +83,13 @@ public class ArmAndWristManager {
             armRight.setDirection(Servo.Direction.REVERSE);
         }
     }
-
     public double getAngleRange() {
         return angleRange;
     }
-
     public void setAngleRange(double angleRange) {
         this.angleRange = angleRange;
+    }
+    public void doTelemetry(Telemetry tele){
+        tele.addData("armAngle = ", armAngle);
     }
 }

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.hardwareClasses.FTC_Addons.tests_and_examples;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardwareClasses.FTC_Addons.AdafruitNeopixelSeesaw;
 
 @TeleOp
+@Disabled
 public class NeopixelTest extends LinearOpMode {
 
     AdafruitNeopixelSeesaw neo;
