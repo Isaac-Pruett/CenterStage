@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.opmodes;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 
 
@@ -10,10 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.TeleOp.FieldRelativeControls;
+import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
-import org.firstinspires.ftc.teamcode.TeleOp.PoseStorage;
-import org.firstinspires.ftc.teamcode.TeleOp.SlidesManager;
+import org.firstinspires.ftc.teamcode.hardwareClasses.PoseStorage;
+import org.firstinspires.ftc.teamcode.hardwareClasses.SlidesManager;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -36,6 +36,8 @@ public class CenterStageTeleOp extends OpMode {
     FieldRelativeControls stick = new FieldRelativeControls();
 
     Servo launcher;
+
+
 
     public static double position1 = 400; // in mm
     public static double position2 = 0; // in mm

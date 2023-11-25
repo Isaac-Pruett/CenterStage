@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.hardwareClasses;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.control.PIDFController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -17,9 +16,9 @@ public class SlidesManager {
     public DcMotorEx left;
     public DcMotorEx right;
 
-    public static double Kp = 3.2;
-    public static double Ki = 0.05;
-    public static double Kd = 0.8;
+    public static double Kp = 0.0;
+    public static double Ki = 0.0;
+    public static double Kd = 0.0;
 
     PIDCoefficients pidCoefficients = new PIDCoefficients(Kp, Ki, Kd);
     boolean REVERSE = false;

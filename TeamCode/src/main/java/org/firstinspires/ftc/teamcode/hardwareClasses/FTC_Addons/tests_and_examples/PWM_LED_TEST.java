@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.FTC_Addons.tests_and_examples;
+package org.firstinspires.ftc.teamcode.hardwareClasses.FTC_Addons.tests_and_examples;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 
-import org.firstinspires.ftc.teamcode.FTC_Addons.pwm_rgb_led_controller;
+import org.firstinspires.ftc.teamcode.hardwareClasses.FTC_Addons.pwm_rgb_led_controller;
 
 @TeleOp
 public class PWM_LED_TEST extends LinearOpMode {
