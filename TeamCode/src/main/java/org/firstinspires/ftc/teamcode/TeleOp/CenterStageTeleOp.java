@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ArmAndWristManager;
+import org.firstinspires.ftc.teamcode.hardwareClasses.ArmManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
@@ -38,7 +39,7 @@ public class CenterStageTeleOp extends OpMode {
 
     Servo launcher;
 
-    ArmAndWristManager arm;
+    ArmManager arm;
 
     ClawManager claw;
 
@@ -64,7 +65,7 @@ public class CenterStageTeleOp extends OpMode {
 
         lift = new SlidesManager(hardwareMap);
 
-        arm = new ArmAndWristManager(hardwareMap);
+        arm = new ArmManager(hardwareMap);
         claw = new ClawManager(hardwareMap);
 
         movementInit();
@@ -108,7 +109,7 @@ public class CenterStageTeleOp extends OpMode {
         } else{
             //lift.setHeightAsync(DistanceUnit.MM, position2);
         }
-        arm.armAngle = (-gamepad2.left_stick_y + 1) / 2 * arm.getAngleRange();
+        arm.armAngle = -gamepad2.left_stick_y / 2  * arm.getAngleRange();
 
 
         if (gamepad2.right_trigger != 0){

@@ -7,89 +7,53 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class ArmAndWristManager implements subsystem {
-    Servo armLeft;
-    Servo armRight;
-    Servo wrist;
+    ArmManager arm;
+    WristManager wrist;
 
-    private double angleRange = 280.0; // in degrees
+    double armLength = 17.0; // in inches
+    double clawLength = 8.0; // in inches TODO: actually tune this
 
-    private double armLength = 19.0; // in inches
+    MODE currentMode;
 
-    private double NomalizeTo90Const = (angleRange/2) - 90; // in degrees
+    public ArmAndWristManager(HardwareMap hardwareMap){
+        arm = new ArmManager(hardwareMap);
+        wrist = new WristManager(hardwareMap);
 
-    boolean lockedAt0 = false;
-    boolean lockedAt30 = false;
-    public double armAngle = 0;
-    public double wristAngle = 0;
-
-    public ArmAndWristManager(HardwareMap hwmp){
-        armLeft = hwmp.get(Servo.class, "armLeft");
-        armRight = hwmp.get(Servo.class, "armRight");
-        wrist = hwmp.get(Servo.class, "wrist");
-
-        setDirections(Servo.Direction.FORWARD);
     }
 
-    private double toServoInput(double angle){
-        return angle/angleRange;
+    public void setMode(MODE m){
+        currentMode = m;
     }
 
-    public void update(){
-        setArmAngle(armAngle);
-        setWristAngle(wristAngle);
-    }
+    public void setDepth(DistanceUnit distanceUnit, double depth){ // TODO
 
-    public void lockAngleAtZero(){
-        lockedAt0 = true;
-        lockedAt30 = false;
-    }
-    public void lockAngleAtThirty(){
-        lockedAt0 = false;
-        lockedAt30 = true;
-    }
+        if (currentMode == MODE.PLACING){
+            double angleRAD = Math.toRadians(wrist.wristAngle);
+            double angleCOS = Math.cos(angleRAD) * clawLength;
+            double adj_depth = depth - distanceUnit.fromInches(angleCOS);
+            double acosine = Math.toDegrees(Math.acos(adj_depth / armLength));
 
-    public void setAdjustedWristAngle(double angle){
-        if (lockedAt30){
-            wristAngle = 150 - armAngle;
-        }else if(lockedAt0){
-            wristAngle = 180 - armAngle;
-        }else{
-            wristAngle = angle;
+
         }
-    }
 
-    public void setAdjustedWristAngle(){
-        setAdjustedWristAngle(0);
     }
 
 
+    @Override
+    public void update() {
+        arm.update();
+        wrist.update();
+    }
 
-    public void setHeight(DistanceUnit distanceUnit, double height){
-        armAngle = Math.toDegrees(Math.asin(distanceUnit.toInches(height)/armLength));
-    }
-    public void setArmAngle(double degrees){
-        armRight.setPosition(toServoInput(degrees));
-        armLeft.setPosition(toServoInput(degrees));
-    }
-    public void setWristAngle(double degrees){
-        wrist.setPosition(toServoInput(degrees));
-    }
-    public void setDirections(Servo.Direction dir){
-        if (dir == Servo.Direction.FORWARD){
-            armLeft.setDirection(Servo.Direction.REVERSE);
-            armRight.setDirection(Servo.Direction.FORWARD);
-        } else{
-            armLeft.setDirection(Servo.Direction.FORWARD);
-            armRight.setDirection(Servo.Direction.REVERSE);
-        }
-    }
-    public double getAngleRange() {
-        return angleRange;
-    }
-    public void setAngleRange(double angleRange) {
-        this.angleRange = angleRange;
-    }
     public void doTelemetry(Telemetry tele){
-        tele.addData("armAngle = ", armAngle);
+        wrist.doTelemetry(tele);
+        arm.doTelemetry(tele);
     }
+
+    enum MODE{
+        PLACING,
+        FLOOR_FRONT,
+        FLOOR_BACK;
+    }
+
 }
