@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 import org.firstinspires.ftc.teamcode.hardwareClasses.PoseStorage;
 import org.firstinspires.ftc.teamcode.hardwareClasses.SlidesManager;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.hardwareClasses.WristManager;
 
 //////////////////////////////////////////////////////////////////////////////
 // CenterStage TeleOp mode
@@ -39,6 +40,7 @@ public class CenterStageTeleOp extends OpMode {
 
     Servo launcher;
 
+    WristManager wrist;
     ArmManager arm;
 
     ClawManager claw;
@@ -65,7 +67,10 @@ public class CenterStageTeleOp extends OpMode {
 
         lift = new SlidesManager(hardwareMap);
 
+        wrist = new WristManager(hardwareMap);
+
         arm = new ArmManager(hardwareMap);
+
         claw = new ClawManager(hardwareMap);
 
         movementInit();
@@ -78,6 +83,8 @@ public class CenterStageTeleOp extends OpMode {
 
         claw.setMiddle();
         launcher.setPosition(1.0);
+        wrist.setWristAngle(-120);
+        lift.setHeightAsync(DistanceUnit.INCH, 4.0);
     }
 
     //code to run repeatedly once driver hits init, before driver hits play
@@ -85,6 +92,7 @@ public class CenterStageTeleOp extends OpMode {
     public void init_loop(){
         drive.update();
         //lift.setHeightAsync(DistanceUnit.MM, 200.0);
+        lift.setHeightAsync(DistanceUnit.INCH, 4.0);
         lift.doTelemetry(telemetry);
         telemetry.update();
     }
@@ -109,7 +117,14 @@ public class CenterStageTeleOp extends OpMode {
         } else{
             //lift.setHeightAsync(DistanceUnit.MM, position2);
         }
-        arm.armAngle = -gamepad2.left_stick_y / 2  * arm.getAngleRange();
+        if (gamepad2.right_trigger != 0){
+            arm.armAngle = 100;
+
+        } else if (gamepad2.right_bumper) {
+            arm.armAngle = 45;
+        } else {
+            arm.armAngle = 90;
+        }
 
 
         if (gamepad2.right_trigger != 0){
