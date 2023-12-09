@@ -81,18 +81,23 @@ public class CenterStageTeleOp extends OpMode {
      */
     public void movementInit(){
 
-        claw.setMiddle();
-        launcher.setPosition(1.0);
-        wrist.setWristAngle(-120);
-        lift.setHeightAsync(DistanceUnit.INCH, 4.0);
+        claw.close();
+        launcher.setPosition(0.5);
+        wrist.wristAngle = -150;
+        //claw.close();
+        //wrist.setWristAngle(-120);
+        //lift.setHeightAsync(DistanceUnit.INCH, 4.0);
     }
 
     //code to run repeatedly once driver hits init, before driver hits play
     @Override
     public void init_loop(){
         drive.update();
+        wrist.update();
+        arm.update();
+        claw.update();
         //lift.setHeightAsync(DistanceUnit.MM, 200.0);
-        lift.setHeightAsync(DistanceUnit.INCH, 4.0);
+        //lift.setHeightAsync(DistanceUnit.INCH, 4.0);
         lift.doTelemetry(telemetry);
         telemetry.update();
     }
@@ -100,11 +105,12 @@ public class CenterStageTeleOp extends OpMode {
     //code to run once driver hits play
     @Override
     public void loop() {
+        //lift.setHeightAsync(DistanceUnit.MM, position2);
         drive.update();
 
+
+
         poseEstimate = drive.getPoseEstimate();
-
-
         if (gamepad2.a) {
             goToTop = true;
         } else if (gamepad2.b) {
@@ -112,25 +118,36 @@ public class CenterStageTeleOp extends OpMode {
         } else {
             //lift.stop();
         }
+
+
+
+
         if (goToTop){
-            //lift.setHeightAsync(DistanceUnit.MM, position1);
-        } else{
-            //lift.setHeightAsync(DistanceUnit.MM, position2);
-        }
-        if (gamepad2.right_trigger != 0){
-            arm.armAngle = 100;
-
-        } else if (gamepad2.right_bumper) {
-            arm.armAngle = 45;
+            lift.setHeightAsync(DistanceUnit.MM, position1);
         } else {
-            arm.armAngle = 90;
+            lift.setHeightAsync(DistanceUnit.MM, position2);
+        }
+        if (gamepad2.right_trigger != 0){ // pick up mode
+            arm.armAngle = 132.5;
+            wrist.wristAngle = 180 - arm.armAngle;
+        } else if (gamepad2.right_bumper) { // place mode
+            arm.armAngle = 45;
+            wrist.wristAngle = 90 - arm.armAngle;
+        } else {
+            arm.armAngle = 90; // neutral mode
+           wrist.wristAngle = 160 - arm.armAngle;
         }
 
+        if (gamepad2.left_bumper){
+            claw.open(ClawManager.CLAWS.OUTER);
+        } else {
+            claw.close();
+        }
 
-        if (gamepad2.right_trigger != 0){
-            launcher.setPosition(0.5);
+        if (gamepad2.y){
+            launcher.setPosition(0);
         } else{
-            launcher.setPosition(1.0);
+            launcher.setPosition(0.5);
         }
         /*
         if (gamepad2.y){
@@ -145,6 +162,8 @@ public class CenterStageTeleOp extends OpMode {
         */
 
         arm.update();
+        wrist.update();
+        claw.update();
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate);
 
 
