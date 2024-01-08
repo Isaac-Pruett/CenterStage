@@ -7,40 +7,40 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class LauncherManager implements subsystem{
 
-    Servo trigger;
-    boolean trigger_status = false;
+    Servo launcher;
+    boolean has_fired = false;
 
     double firing_pos = 1;
     double locked_pos = .5;
 
-    double current_trigger_pos;
+    double current_launcher_pos;
 
 
     public LauncherManager(HardwareMap hwmp){
-        trigger = hwmp.get(Servo.class, "trigger");
+        launcher = hwmp.get(Servo.class, "launcher");
     }
 
     public void lock(){
-        current_trigger_pos = locked_pos;
-        trigger_status = false;
+        current_launcher_pos = locked_pos;
+        has_fired = false;
     }
 
 
     public void fire(){
-        if (!trigger_status){
-            current_trigger_pos = firing_pos;
-            trigger_status = true;
+        if (!has_fired){
+            current_launcher_pos = firing_pos;
+            has_fired = true;
         }
     }
 
     @Override
     public void update() {
-        trigger.setPosition(current_trigger_pos);
+        launcher.setPosition(current_launcher_pos);
     }
 
     @Override
     public void doTelemetry(Telemetry tele) {
-        tele.addData("has Fired? = ", trigger_status);
+        tele.addData("has Fired? = ", has_fired);
 
     }
 }

@@ -11,7 +11,7 @@ public class ArmManager implements subsystem {
     Servo armRight;
 
     public double armAngle;
-    private double angleRange = 300.0;
+    public double angleRange = 300.0;
 
     public ArmManager(HardwareMap hwmp){
         armLeft = hwmp.get(Servo.class, "armLeft");
@@ -23,8 +23,13 @@ public class ArmManager implements subsystem {
 
     @Override
     public void update() {
-        armLeft.setPosition(toServoInput(armAngle));
-        armRight.setPosition(toServoInput(armAngle));
+        if (armRight.getDirection() == Servo.Direction.FORWARD) {
+            armLeft.setPosition(toServoInput(armAngle) + .016);
+            armRight.setPosition(toServoInput(armAngle) + .016);
+        } else {
+            armLeft.setPosition(toServoInput(armAngle) - .016);
+            armRight.setPosition(toServoInput(armAngle) - .016);
+        }
     }
 
     public void setArmAngle(double angle){
@@ -39,6 +44,8 @@ public class ArmManager implements subsystem {
     @Override
     public void doTelemetry(Telemetry tele) {
         tele.addData("Arm Angle = ", armAngle);
+        tele.addData("ServoLeft = ", armLeft.getPosition());
+        tele.addData("ServoRight = ", armRight.getPosition());
     }
 
 
@@ -54,6 +61,13 @@ public class ArmManager implements subsystem {
 
     private double Normalize(double angle){
         return (angleRange/2) + angle;
+    }
+
+    public double convertFromUnitCircle(double angle){
+        return ((-1.0 * angle) + 90.0);
+    }
+    public double convertToUnitCircle(double angle){
+        return (angle - 90.0) * -1.0;
     }
 
     public double getAngleRange() {

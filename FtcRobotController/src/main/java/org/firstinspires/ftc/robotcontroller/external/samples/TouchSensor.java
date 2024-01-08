@@ -32,7 +32,6 @@ package org.firstinspires.ftc.robotcontroller.external.samples;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 
 /*
  * This OpMode demonstrates how to use a REV Robotics Touch Sensor, REV Robotics Magnetic Limit Switch, or other device
@@ -49,14 +48,14 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
  */
 @TeleOp(name = "Sensor: REV touch sensor", group = "Sensor")
 @Disabled
-public class SensorTouch extends LinearOpMode {
-    TouchSensor touchSensor;  // Touch sensor Object
+public class TouchSensor extends LinearOpMode {
+    com.qualcomm.robotcore.hardware.TouchSensor touchSensor;  // Touch sensor Object
 
     @Override
     public void runOpMode() {
 
         // get a reference to our touchSensor object.
-        touchSensor = hardwareMap.get(TouchSensor.class, "sensor_touch");
+        touchSensor = hardwareMap.get(com.qualcomm.robotcore.hardware.TouchSensor.class, "sensor_touch");
 
         // wait for the start button to be pressed.
         waitForStart();

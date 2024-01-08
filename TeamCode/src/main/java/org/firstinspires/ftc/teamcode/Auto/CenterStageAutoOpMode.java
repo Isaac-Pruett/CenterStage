@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ArmAndWristManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
@@ -33,13 +34,14 @@ public class CenterStageAutoOpMode extends OpMode {
 
     public void init_motion(){
         claw.setCosmetic();
-        slides.zeroSlides();
+        slides.setTarget(DistanceUnit.MM, 0);
 
     }
 
     @Override
     public void init_loop(){
-
+        slides.update();
+        drive.update();
 
     }
 

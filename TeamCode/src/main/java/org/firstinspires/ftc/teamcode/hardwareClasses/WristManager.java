@@ -9,10 +9,10 @@ public class WristManager implements subsystem {
 
     Servo wrist;
 
-    public double wristAngle;
+    private double wristAngle = 0;
     private final double angleRange = 300.0;
 
-    public static double maxRange = 300.0 - 60.0;
+    private static double maxRange = 300.0 - 60.0;
 
     public WristManager(HardwareMap hwmp){
         wrist = hwmp.get(Servo.class, "wrist");
