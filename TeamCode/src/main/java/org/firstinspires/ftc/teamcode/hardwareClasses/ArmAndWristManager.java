@@ -7,13 +7,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class ArmAndWristManager implements subsystem {
-    ArmManager arm;
-    WristManager wrist;
+    public ArmManager arm;
+    public WristManager wrist;
+
+    // both of these values are from mounting points,
+    // as if each were a straight,
+    // perfectly rigid line.
+    // (definition of the magnitude of a slope)
 
     double armLength = 17.0; // in inches
-    double clawLength = 8.0; // in inches TODO: actually tune this
+    double clawLength = 6.5; // in inches
 
-    MODE currentMode = MODE.COSMETIC;
+    private MODE currentMode = MODE.COSMETIC;
 
     public ArmAndWristManager(HardwareMap hardwareMap){
         arm = new ArmManager(hardwareMap);
@@ -25,8 +30,15 @@ public class ArmAndWristManager implements subsystem {
         currentMode = m;
     }
 
+    public MODE getMode(){
+        return currentMode;
+    }
 
-    /*
+
+    /*  TODO: this has been commented out bc of simplicity,
+        TODO: it should probably be implemented for auto and driving,
+        TODO: as it is the ideal control scheme.
+
     /**
      * @param distanceUnit unit
      * @param depth can be negative for other side of bot
@@ -70,25 +82,49 @@ public class ArmAndWristManager implements subsystem {
     }
     */
 
+    /**
+     * @return expected wrist angle (in the angle input that the wrist understands) given a MODE and armAngle.
+     * Mind the servo direction.
+     */
     public double getExpectedWristAngle(){
         double theta = arm.convertToUnitCircle(arm.armAngle);
         if (currentMode == MODE.PLACING){
+            //if we are placing on the board,
             return theta + 30.0;
         } else if (currentMode == MODE.FLOOR_FRONT){
-            //return theta + 90.0;
+            // this calculation is the correct one.
+            // see arm.convertToUnitCircle().
+            // the reason why is bc
+            // arm.convertToUnitCircle(135DEG).
+            // = (135DEG-90DEG) * -1 == -45DEG,
+            // which makes perfect sense.
+            return theta + 90.0;
+            // this is slightly complicated. also WRONG.
+            // as the unit circle input doesnt account for negative angles,
+            // so we have to make a negative angle if it makes no sense.
+            // basically, if the unit circle (arm angle) drops below 0DEG,
+            // we know that it is > 90DEG, because if we place on the front side,
+            // it doesnt make sense to have the arm pointing backward.
+            // in fact, it could be even 45DEG, but 90DEG makes more sense atm.
+            /*
             if (theta <= 90){
                 return theta + 90.0;
             } else{
                 return (360 - theta);
             }
+            */
         } else if (currentMode == MODE.FLOOR_BACK){
             return theta - 270.0;
         }else if (currentMode == MODE.COSMETIC){
+            return theta - 90.0;
+            //see case for MODE.FLOOR_FRONT.
+            /*
             if (theta <= 90){
                 return theta - 90.0;
             } else{
                 return (theta - 360.0) - 90.0;
             }
+            */
         }else{
             return 0;
         }

@@ -26,7 +26,7 @@ public class SlidesManager implements subsystem{
     double counts_per_rev = 384.5;
     double target = 0; // in mm
     double last_target = 0;
-    DistanceUnit dU = DistanceUnit.MM;
+    public DistanceUnit dU = DistanceUnit.MM;
 
     private double power = 1.0;
 

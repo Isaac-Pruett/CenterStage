@@ -10,9 +10,11 @@ public class WristManager implements subsystem {
     Servo wrist;
 
     private double wristAngle = 0;
-    private final double angleRange = 300.0;
+    public final double angleRange = 300.0;
 
-    private static double maxRange = 300.0 - 60.0;
+    private static double maxAngle = 140.0;
+
+    private static double minAngle = -150.0;
 
     public WristManager(HardwareMap hwmp){
         wrist = hwmp.get(Servo.class, "wrist");
@@ -23,14 +25,22 @@ public class WristManager implements subsystem {
 
     @Override
     public void update() {
-        wrist.setPosition(toServoInput(wristAngle));
+        if (wrist.getDirection() == Servo.Direction.FORWARD) {
+            wrist.setPosition(toServoInput(wristAngle) + .061);
+        } else {
+            wrist.setPosition(toServoInput(wristAngle) - .061);
+        }
 
     }
 
     public void setWristAngle(double angle){
-        if (wristAngle >= -maxRange/2 && wristAngle <= maxRange/2){
-            wristAngle = angle;
+        if (angle > maxAngle){
+            angle = maxAngle;
+        } else if (angle < minAngle) {
+            angle = minAngle;
         }
+        wristAngle = angle;
+
     }
 
     private double toServoInput(double angle){
@@ -39,6 +49,7 @@ public class WristManager implements subsystem {
     @Override
     public void doTelemetry(Telemetry tele) {
         tele.addData("Wrist Angle = ", wristAngle);
+        tele.addData("Wrist servo Pos = ", wrist.getPosition());
     }
 
 
@@ -48,5 +59,9 @@ public class WristManager implements subsystem {
 
     private double Normalize(double angle){
         return (angleRange/2) + angle;
+    }
+
+    public double getWristAngle() {
+        return wristAngle;
     }
 }

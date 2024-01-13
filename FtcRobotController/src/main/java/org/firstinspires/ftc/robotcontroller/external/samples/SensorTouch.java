@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  */
 @TeleOp(name = "Sensor: REV touch sensor", group = "Sensor")
 @Disabled
-public class TouchSensor extends LinearOpMode {
+public class SensorTouch extends LinearOpMode {
     com.qualcomm.robotcore.hardware.TouchSensor touchSensor;  // Touch sensor Object
 
     @Override

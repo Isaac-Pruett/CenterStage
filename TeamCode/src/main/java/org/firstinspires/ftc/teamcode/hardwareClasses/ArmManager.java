@@ -33,9 +33,13 @@ public class ArmManager implements subsystem {
     }
 
     public void setArmAngle(double angle){
-        if (armAngle >= -angleRange/2 && armAngle <= angleRange/2){
-            armAngle = angle;
+        if (angle > angleRange/2){
+            angle = angleRange/2;
+        } else if (angle < -angleRange/2) {
+            angle = -angleRange/2;
         }
+        armAngle = angle;
+
     }
 
     private double toServoInput(double angle){

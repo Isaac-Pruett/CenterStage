@@ -10,16 +10,14 @@ public class ClawManager implements subsystem{
     Servo outer;
 
     double middle = 0.5;
-    private double innerClosed = .685;
-    private double innerOpen = middle;
-    private double outerOpen = .4;
-    private double outerClosed = .685;
+    private final double innerClosed = .67;
+    private final double innerOpen = .53;
+    private final double outerOpen = innerOpen - .07;
+    private final double outerClosed = .67;
+    private final double cosmetic = .645;
 
-    private double cosmetic = .63;
-
-    private double innerPos;
-
-    private double outerPos;
+    public double innerPos;
+    public double outerPos;
 
 
 
@@ -66,8 +64,10 @@ public class ClawManager implements subsystem{
     }
 
     public void doTelemetry(Telemetry tele){
-        tele.addData("outer", outerPos);
-        tele.addData("inner", innerPos);
+        tele.addData("outerTARGET", outerPos);
+        tele.addData("innerTARGET", innerPos);
+        tele.addData("outerSERVO", outer.getPosition());
+        tele.addData("innerSERVO", inner.getPosition());
     }
 
 }
