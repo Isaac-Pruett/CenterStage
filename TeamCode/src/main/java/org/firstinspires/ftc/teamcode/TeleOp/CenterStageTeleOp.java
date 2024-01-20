@@ -169,10 +169,18 @@ public class CenterStageTeleOp extends OpMode {
 
 
         wristANG = wrist.getWristAngle();
-        if (gamepad2.dpad_up){
-            wristANG += wristINCR;
-        } else if (gamepad2.dpad_down) {
-            wristANG -= wristINCR;
+        if (arm.armAngle <= 0) {
+            if (gamepad2.dpad_up) {
+                wristANG += wristINCR;
+            } else if (gamepad2.dpad_down) {
+                wristANG -= wristINCR;
+            }
+        } else {
+            if (gamepad2.dpad_up) {
+                wristANG -= wristINCR;
+            } else if (gamepad2.dpad_down) {
+                wristANG += wristINCR;
+            }
         }
         wrist.setWristAngle(wristANG);
 
