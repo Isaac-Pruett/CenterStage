@@ -13,7 +13,7 @@ public class LauncherManager implements subsystem{
     double firing_pos = 1;
     double locked_pos = .5;
 
-    double current_launcher_pos;
+    double current_launcher_pos = locked_pos;
 
 
     public LauncherManager(HardwareMap hwmp){

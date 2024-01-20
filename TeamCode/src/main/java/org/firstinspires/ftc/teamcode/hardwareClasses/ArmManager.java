@@ -11,7 +11,7 @@ public class ArmManager implements subsystem {
     Servo armRight;
 
     public double armAngle;
-    public double angleRange = 300.0;
+    public double angleRange = 355.0;
 
     public ArmManager(HardwareMap hwmp){
         armLeft = hwmp.get(Servo.class, "armLeft");

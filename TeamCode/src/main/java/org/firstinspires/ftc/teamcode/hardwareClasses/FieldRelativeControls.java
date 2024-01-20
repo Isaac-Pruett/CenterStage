@@ -7,11 +7,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 
 public class FieldRelativeControls {
-    public void fieldRelativeMovement(MecanumDrive drive, Gamepad gamepad1, Pose2d poseEstimate){
+    public void fieldRelativeMovement(MecanumDrive drive, Gamepad gamepad1, Pose2d poseEstimate, double speed){
         Vector2d input = new Vector2d(
                 -gamepad1.left_stick_y,
                 -gamepad1.left_stick_x
         ).rotated(-poseEstimate.getHeading());
+        input = input.times(speed);
 
 
         drive.setWeightedDrivePower(

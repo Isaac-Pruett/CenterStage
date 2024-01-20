@@ -14,7 +14,7 @@ public class WristManager implements subsystem {
 
     private static double maxAngle = 140.0;
 
-    private static double minAngle = -150.0;
+    private static double minAngle = -160.0;
 
     public WristManager(HardwareMap hwmp){
         wrist = hwmp.get(Servo.class, "wrist");

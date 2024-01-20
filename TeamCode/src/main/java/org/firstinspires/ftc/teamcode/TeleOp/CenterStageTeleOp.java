@@ -46,7 +46,9 @@ public class CenterStageTeleOp extends OpMode {
     public double wristINCR = 2.5;
     public double slidesTarget = 0;
 
-    public double slidesINCR = 36; // in mm
+    public double slidesINCR = 42.0;  // 84.0/2.0 // in mm
+
+    double speed = 0.7;
 
 
     //////////////////////////////////////////////////////////////////////////////
@@ -91,13 +93,19 @@ public class CenterStageTeleOp extends OpMode {
     public void init_loop(){
 
         if (gamepad2.x){
-            claw.close();
-        } else if (gamepad2.left_stick_button){
             claw.setCosmetic();
+        } else if (gamepad2.left_stick_button){
+            claw.close();
+        }
+
+        if (gamepad2.right_stick_button){
+            launcher.fire();
+        } else if (gamepad2.start) {
+            launcher.lock();
         }
 
         drive.update();
-        wrist.update();
+        //wrist.update();
         //arm.update();
         claw.update();
 
@@ -126,6 +134,8 @@ public class CenterStageTeleOp extends OpMode {
 
         if (gamepad2.right_stick_button){
             launcher.fire();
+        } else if (gamepad2.start) {
+            launcher.lock();
         }
 
         /*
@@ -144,7 +154,7 @@ public class CenterStageTeleOp extends OpMode {
 
 
         slidesTarget = slides.dU.toMm(slides.getTarget());
-        if (gamepad2.right_trigger != 0){
+        if (gamepad2.right_trigger != 0 && ((slidesTarget - slidesINCR) >= 0)){
             slidesTarget -= slidesINCR;
             slides.setTarget(DistanceUnit.MM, slidesTarget);
         } else if (gamepad2.right_bumper){
@@ -181,6 +191,12 @@ public class CenterStageTeleOp extends OpMode {
         //claw.outerPos = ((gamepad2.right_stick_y + 1) / 2);
         //arm.armAngle = gamepad2.right_stick_y * (arm.angleRange/2);
 
+        if (gamepad1.right_trigger != 0 && gamepad1.left_trigger != 0){
+            speed = .8;
+        }else{
+            speed = .6;
+        }
+
 
         claw.update();
         wrist.update();
@@ -188,7 +204,7 @@ public class CenterStageTeleOp extends OpMode {
         slides.update();
         launcher.update();
         //updates the drive power here
-        stick.fieldRelativeMovement(drive, gamepad1, poseEstimate);
+        stick.fieldRelativeMovement(drive, gamepad1, poseEstimate, speed);
 
 
 
