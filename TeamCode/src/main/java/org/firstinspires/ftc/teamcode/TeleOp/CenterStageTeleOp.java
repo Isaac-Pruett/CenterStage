@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.gamepadExpansions.ButtonExpanded;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ArmManager;
-import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
+//import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
 import org.firstinspires.ftc.teamcode.hardwareClasses.LauncherManager;
@@ -231,7 +231,7 @@ public class CenterStageTeleOp extends OpMode {
         if (gamepad1.right_trigger != 0 && gamepad1.left_trigger != 0){
             speed = .8;
         }else{
-            speed = .6;
+            speed = .65;
         }
 
 
