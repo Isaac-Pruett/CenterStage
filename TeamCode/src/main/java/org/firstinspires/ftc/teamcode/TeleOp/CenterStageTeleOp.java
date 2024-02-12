@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.hardwareClasses.ArmManager;
 //import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
+import org.firstinspires.ftc.teamcode.hardwareClasses.IntakeManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.LauncherManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.PlungerManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.PoseStorage;
@@ -52,6 +53,7 @@ public class CenterStageTeleOp extends OpMode {
 
     double speed = 0.7;
     PlungerManager plunger;
+    IntakeManager intake;
 
 
     ButtonExpanded slidesDownButton = new ButtonExpanded();
@@ -61,6 +63,8 @@ public class CenterStageTeleOp extends OpMode {
 
     ButtonExpanded wristUpButton = new ButtonExpanded();
     ButtonExpanded wristDownButton = new ButtonExpanded();
+
+
     ButtonExpanded plungerOutButton = new ButtonExpanded();
     ButtonExpanded plungerInButton = new ButtonExpanded();
 
@@ -88,6 +92,8 @@ public class CenterStageTeleOp extends OpMode {
 
         slides.setThreshold(DistanceUnit.MM, thresh);
 
+        intake = new IntakeManager(hardwareMap);
+
         movementInit();
     }
 
@@ -97,6 +103,7 @@ public class CenterStageTeleOp extends OpMode {
     public void movementInit(){
         plunger.extendFully();
         plunger.update();
+        intake.update();
 
         //claw.setCosmetic();
 
@@ -149,14 +156,9 @@ public class CenterStageTeleOp extends OpMode {
         }
         */
 
-        slidesDownButton.update(gamepad2.right_trigger != 0);
-        slidesUpButton.update(gamepad2.right_bumper);
-        armDownButton.update(gamepad2.a);
-        armUpButton.update(gamepad2.y);
-        wristDownButton.update(gamepad2.dpad_down);
-        wristUpButton.update(gamepad2.dpad_up);
-        plungerOutButton.update(gamepad2.left_trigger != 0);
-        plungerInButton.update(gamepad2.left_bumper);
+
+
+
 
 
 
@@ -165,11 +167,13 @@ public class CenterStageTeleOp extends OpMode {
         } else if (gamepad2.start) {
             launcher.lock();
         }
-        if (gamepad2.left_bumper && plungerInButton.isChanged(gamepad2.left_bumper)){
+
+        if (gamepad2.left_bumper && plungerInButton.isChanged(gamepad2.left_bumper)){ //&& plungerInButton.isChanged(gamepad2.left_bumper)
             plunger.retract();
-        } else if (gamepad2.left_trigger != 0 && plungerOutButton.isChanged(gamepad2.left_trigger != 0)){
+        } else if (gamepad2.left_trigger != 0 && plungerOutButton.isChanged(gamepad2.left_trigger != 0)){ //&& plungerOutButton.isChanged(gamepad2.left_trigger != 0)
             plunger.extend();
         }
+
         /*
         if (gamepad2.y){
             claw.setCosmetic();
@@ -183,10 +187,10 @@ public class CenterStageTeleOp extends OpMode {
             claw.close();
         } */
         slidesTarget = slides.dU.toMm(slides.getTarget());
-        if (gamepad2.right_trigger != 0 && slidesDownButton.isChanged(gamepad2.right_trigger != 0) && ((slidesTarget - slidesINCR) >= 0)){
+        if (gamepad2.right_trigger != 0 && (slidesTarget - slidesINCR) >= 0 && slidesDownButton.isChanged(gamepad2.right_trigger != 0)){ //  && slidesDownButton.isChanged(gamepad2.right_trigger != 0))
             slidesTarget -= slidesINCR;
             slides.setTarget(DistanceUnit.MM, slidesTarget);
-        } else if (gamepad2.right_bumper && slidesUpButton.isChanged(gamepad2.right_bumper)){
+        } else if (gamepad2.right_bumper && slidesUpButton.isChanged(gamepad2.right_bumper)){ //  && slidesUpButton.isChanged(gamepad2.right_bumper)
             slidesTarget += slidesINCR;
             slides.setTarget(DistanceUnit.MM, slidesTarget);
         } else if (gamepad2.x) {
@@ -199,15 +203,15 @@ public class CenterStageTeleOp extends OpMode {
 
         wristANG = wrist.getWristAngle();
         if (arm.armAngle >= 0) {
-            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) {
+            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) { //  && wristUpButton.isChanged(gamepad2.dpad_up)
                 wristANG += wristINCR;
-            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) {
+            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) { // && wristDownButton.isChanged(gamepad2.dpad_down)
                 wristANG -= wristINCR;
             }
         } else {
-            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) {
+            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) { //  && wristUpButton.isChanged(gamepad2.dpad_up)
                 wristANG -= wristINCR;
-            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) {
+            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) { //  && wristDownButton.isChanged(gamepad2.dpad_down)
                 wristANG += wristINCR;
             }
         }
@@ -216,9 +220,9 @@ public class CenterStageTeleOp extends OpMode {
 
 
         armANG = arm.armAngle;
-        if (gamepad2.y && armUpButton.isChanged(gamepad2.y)){
+        if (gamepad2.y && armUpButton.isChanged(gamepad2.y)){ // && armUpButton.isChanged(gamepad2.y)
             armANG += armINCR;
-        } else if (gamepad2.a && armUpButton.isChanged(gamepad2.a)) {
+        } else if (gamepad2.a && armDownButton.isChanged(gamepad2.a)) { // && armDownButton.isChanged(gamepad2.a)
             armANG -= armINCR;
         }
         arm.setArmAngle(armANG);
@@ -240,8 +244,20 @@ public class CenterStageTeleOp extends OpMode {
         arm.update();
         slides.update();
         launcher.update();
+        plunger.update();
         //updates the drive power here
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate, speed);
+
+
+
+        plungerOutButton.update(gamepad2.left_trigger != 0);
+        plungerInButton.update(gamepad2.left_bumper);
+        slidesDownButton.update(gamepad2.right_trigger != 0);
+        slidesUpButton.update(gamepad2.right_bumper);
+        armDownButton.update(gamepad2.a);
+        armUpButton.update(gamepad2.y);
+        wristDownButton.update(gamepad2.dpad_down);
+        wristUpButton.update(gamepad2.dpad_up);
 
 
 
@@ -250,6 +266,8 @@ public class CenterStageTeleOp extends OpMode {
         arm.doTelemetry(telemetry);
         slides.doTelemetry(telemetry);
         launcher.doTelemetry(telemetry);
+        plunger.doTelemetry(telemetry);
+        intake.doTelemetry(telemetry);
         //drive.doTelemetry() more or less.
         driveTelemetry();
 

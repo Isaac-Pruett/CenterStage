@@ -97,9 +97,9 @@ public class SlidesManager implements subsystem{
                 right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 setRawPower(-0.8);
             }else{
-                target = 0;
-                zeroEncoders();
                 stop();
+                zeroEncoders();
+                target = 0;
             }
         } else{
             setHeightAsync(dU, target);
@@ -137,7 +137,7 @@ public class SlidesManager implements subsystem{
         right.setPower(power);
     }
     private boolean limitsArePressed(){
-        return (limitLeft.isPressed() && limitRight.isPressed());
+        return (limitLeft.isPressed() || limitRight.isPressed());
     }
 
     public void setThreshold(DistanceUnit distanceUnit, double threshold){

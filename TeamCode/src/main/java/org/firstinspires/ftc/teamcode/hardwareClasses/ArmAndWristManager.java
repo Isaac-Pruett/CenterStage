@@ -15,8 +15,8 @@ public class ArmAndWristManager implements subsystem {
     // perfectly rigid line.
     // (definition of the magnitude of a slope)
 
-    double armLength = 17.0; // in inches
-    double clawLength = 6.5; // in inches
+    double armLength = 19.0; // in inches
+    double clawLength = 4.5; // in inches
 
     private MODE currentMode = MODE.COSMETIC;
 

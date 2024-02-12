@@ -7,9 +7,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class PlungerManager implements subsystem {
     public Servo actuator;
-    double current = 1.0;
-    double retracted = 0.0;
-    double halfway = 0.5;
+    public double current = 1.0;
+    double retracted = 0.47;
+    double halfway = 0.72;
     double extended = 1.0;
 
     public PlungerManager(HardwareMap hwmp){
@@ -24,14 +24,14 @@ public class PlungerManager implements subsystem {
     public void extend(){
         if (current == halfway){
             current = extended;
-        } else{
+        } else if (current == retracted){
             current = halfway;
         }
     }
     public void retract(){
         if (current == halfway){
             current = retracted;
-        } else {
+        } else if (current == extended){
             current = halfway;
         }
     }
@@ -44,6 +44,13 @@ public class PlungerManager implements subsystem {
 
     @Override
     public void doTelemetry(Telemetry tele) {
+        if (current == extended){
+            tele.addLine("Plunger is Extended");
+        } else if (current == retracted){
+            tele.addLine("Plunger is Retracted");
+        } else{
+            tele.addLine("Plunger is Halfway Extended");
+        }
         tele.addData("plunger current = ", current);
         tele.addData("plunger currentPos = ", actuator.getPosition());
     }

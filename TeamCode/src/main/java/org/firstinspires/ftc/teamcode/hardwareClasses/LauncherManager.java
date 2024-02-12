@@ -11,7 +11,7 @@ public class LauncherManager implements subsystem{
     boolean has_fired = false;
 
     double firing_pos = 1;
-    double locked_pos = .5;
+    double locked_pos = .47;
 
     double current_launcher_pos = locked_pos;
 
