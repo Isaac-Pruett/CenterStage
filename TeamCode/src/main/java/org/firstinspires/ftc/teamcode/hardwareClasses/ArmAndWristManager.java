@@ -91,7 +91,7 @@ public class ArmAndWristManager implements subsystem {
         if (currentMode == MODE.PLACING){
             //if we are placing on the board,
             return theta + 30.0;
-        } else if (currentMode == MODE.FLOOR_FRONT){
+        } else if (currentMode == MODE.FLOOR_BACK){
             // this calculation is the correct one.
             // see arm.convertToUnitCircle().
             // the reason why is bc
@@ -113,9 +113,9 @@ public class ArmAndWristManager implements subsystem {
                 return (360 - theta);
             }
             */
-        } else if (currentMode == MODE.FLOOR_BACK){
+        } else if (currentMode == MODE.FLOOR_FRONT){
             return theta - 270.0;
-        }else if (currentMode == MODE.COSMETIC){
+        } else if (currentMode == MODE.COSMETIC){
             return theta - 90.0;
             //see case for MODE.FLOOR_FRONT.
             /*
@@ -125,8 +125,11 @@ public class ArmAndWristManager implements subsystem {
                 return (theta - 360.0) - 90.0;
             }
             */
-        }else{
-            return 0;
+        } else if (currentMode == MODE.POKE) {
+            return theta - 285.0;
+
+        } else{
+            return wrist.getWristAngle();
         }
     }
 
@@ -138,16 +141,21 @@ public class ArmAndWristManager implements subsystem {
     }
 
     public void doTelemetry(Telemetry tele){
+        tele.addData("Current mode = ", currentMode.name());
+        tele.addData("arm unit circle angle = ", arm.convertToUnitCircle(arm.armAngle));
         wrist.doTelemetry(tele);
         arm.doTelemetry(tele);
     }
 
-    enum MODE{
+    public enum MODE{
         PLACING,
         FLOOR_FRONT,
 
         COSMETIC,
-        FLOOR_BACK;
+        FLOOR_BACK,
+        POKE,
+        MANUAL;
+
     }
 
 }

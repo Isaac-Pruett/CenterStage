@@ -61,6 +61,10 @@ public class SlidesManager implements subsystem{
         return distanceUnit.fromMm(ticks * (pulley_diameter * Math.PI / counts_per_rev));
     }
 
+    public boolean isAtTarget(){
+        boolean combined = left.isBusy() || right.isBusy();
+        return !combined;
+    }
     private void zeroEncoders(){
         left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

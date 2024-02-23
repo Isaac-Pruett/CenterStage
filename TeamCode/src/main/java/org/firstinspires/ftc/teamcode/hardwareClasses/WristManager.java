@@ -19,16 +19,16 @@ public class WristManager implements subsystem {
     public WristManager(HardwareMap hwmp){
         wrist = hwmp.get(Servo.class, "wrist");
 
-        setDirection(Servo.Direction.FORWARD);
+        setDirection(Servo.Direction.REVERSE);
     }
 
 
     @Override
     public void update() {
         if (wrist.getDirection() == Servo.Direction.FORWARD) {
-            wrist.setPosition(toServoInput(wristAngle) + .061);
+            wrist.setPosition(toServoInput(wristAngle) + .02);
         } else {
-            wrist.setPosition(toServoInput(wristAngle) - .061);
+            wrist.setPosition(toServoInput(wristAngle) - .02);
         }
 
     }

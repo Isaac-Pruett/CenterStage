@@ -23,12 +23,13 @@ public class ArmManager implements subsystem {
 
     @Override
     public void update() {
+        double adj = .0212;
         if (armRight.getDirection() == Servo.Direction.FORWARD) {
-            armLeft.setPosition(toServoInput(armAngle) + .016);
-            armRight.setPosition(toServoInput(armAngle) + .016);
+            armLeft.setPosition(toServoInput(armAngle) + adj);
+            armRight.setPosition(toServoInput(armAngle) + adj);
         } else {
-            armLeft.setPosition(toServoInput(armAngle) - .016);
-            armRight.setPosition(toServoInput(armAngle) - .016);
+            armLeft.setPosition(toServoInput(armAngle) - adj);
+            armRight.setPosition(toServoInput(armAngle) - adj);
         }
     }
 

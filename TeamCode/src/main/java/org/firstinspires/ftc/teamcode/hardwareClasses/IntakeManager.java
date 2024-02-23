@@ -9,9 +9,9 @@ public class IntakeManager implements subsystem{
 
     Servo leftPaddle;
     Servo rightPaddle;
-    boolean REVERSED = false;
-    double open = 1.0;
-    double closed = .35;
+    boolean REVERSED = true;
+    double open = 1.0-.03;
+    double closed = .39;
     public double currentpos = open;
 
     public IntakeManager(HardwareMap hwmp){

@@ -4,14 +4,18 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.gamepadExpansions.ButtonExpanded;
+import org.firstinspires.ftc.teamcode.hardwareClasses.Alliance;
+import org.firstinspires.ftc.teamcode.hardwareClasses.ArmAndWristManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.ArmManager;
 //import org.firstinspires.ftc.teamcode.hardwareClasses.ClawManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.FieldRelativeControls;
 
 import org.firstinspires.ftc.teamcode.hardwareClasses.IntakeManager;
+import org.firstinspires.ftc.teamcode.hardwareClasses.LEDs;
 import org.firstinspires.ftc.teamcode.hardwareClasses.LauncherManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.PlungerManager;
 import org.firstinspires.ftc.teamcode.hardwareClasses.PoseStorage;
@@ -36,17 +40,17 @@ public class CenterStageTeleOp extends OpMode {
     Pose2d poseEstimate;
     SlidesManager slides;
     FieldRelativeControls stick = new FieldRelativeControls();
-    WristManager wrist;
-    ArmManager arm;
+    ArmAndWristManager armAndWrist;
     LauncherManager launcher;
+
+    LEDs leDs;
+
     //ClawManager claw;
     public static double thresh = 10.0;// in mm again
 
-    public double armANG = 0;
 
-    public double armINCR = 2.5;
-    public double wristANG = 0;
-    public double wristINCR = 2.5;
+    public double armINCR = 5;
+
     public double slidesTarget = 0;
 
     public double slidesINCR = 42.0;  // 84.0/2.0 // in mm
@@ -58,15 +62,14 @@ public class CenterStageTeleOp extends OpMode {
 
     ButtonExpanded slidesDownButton = new ButtonExpanded();
     ButtonExpanded slidesUpButton = new ButtonExpanded();
-    ButtonExpanded armUpButton = new ButtonExpanded();
-    ButtonExpanded armDownButton = new ButtonExpanded();
-
-    ButtonExpanded wristUpButton = new ButtonExpanded();
-    ButtonExpanded wristDownButton = new ButtonExpanded();
-
-
     ButtonExpanded plungerOutButton = new ButtonExpanded();
     ButtonExpanded plungerInButton = new ButtonExpanded();
+    ButtonExpanded depositModeButton = new ButtonExpanded();
+    ButtonExpanded collectModeButton = new ButtonExpanded();
+
+    ButtonExpanded intakeMoveButton = new ButtonExpanded();
+
+    ButtonExpanded hangButton = new ButtonExpanded();
 
     //////////////////////////////////////////////////////////////////////////////
     //TeleOp functions
@@ -82,9 +85,7 @@ public class CenterStageTeleOp extends OpMode {
 
         slides = new SlidesManager(hardwareMap);
 
-        wrist = new WristManager(hardwareMap);
-
-        arm = new ArmManager(hardwareMap);
+        armAndWrist = new ArmAndWristManager(hardwareMap);
 
         plunger = new PlungerManager(hardwareMap);
 
@@ -93,6 +94,8 @@ public class CenterStageTeleOp extends OpMode {
         slides.setThreshold(DistanceUnit.MM, thresh);
 
         intake = new IntakeManager(hardwareMap);
+
+        leDs = new LEDs(hardwareMap);
 
         movementInit();
     }
@@ -104,12 +107,16 @@ public class CenterStageTeleOp extends OpMode {
         plunger.extendFully();
         plunger.update();
         intake.update();
+        armAndWrist.arm.setArmAngle(0.0);
 
+        leDs.clearAll();
         //claw.setCosmetic();
 
         launcher.lock();
 
         slides.zeroSlides();
+
+        armAndWrist.setMode(ArmAndWristManager.MODE.POKE);
     }
 
     //code to run repeatedly once driver hits init, before driver hits play
@@ -127,6 +134,24 @@ public class CenterStageTeleOp extends OpMode {
         } else if (gamepad2.start) {
             launcher.lock();
         }
+
+        if (gamepad1.x){
+            leDs.setAlternatingColor(0x0000ff, 0x3311ff);
+            Alliance.ARE_LEDS_ENABLED = true;
+            Alliance.state = Alliance.list.BLUE;
+        } else if (gamepad1.b) {
+            leDs.setAlternatingColor(0xff0000, 0xff2200);
+            Alliance.state = Alliance.list.RED;
+        } else if (gamepad1.a){
+            leDs.clearAll();
+            Alliance.ARE_LEDS_ENABLED = false;
+        } else if (Alliance.ARE_LEDS_ENABLED && Alliance.state == Alliance.list.BLUE){
+            leDs.setAlternatingColor(0x0000ff, 0x3311ff);
+        } else if (Alliance.ARE_LEDS_ENABLED && Alliance.state == Alliance.list.RED) {
+            leDs.setAlternatingColor(0xff0000, 0xff2200);
+        }
+        leDs.update();
+
 
         drive.update();
         //wrist.update();
@@ -156,11 +181,7 @@ public class CenterStageTeleOp extends OpMode {
         }
         */
 
-
-
-
-
-
+        armAndWrist.arm.setArmAngle(armAndWrist.arm.armAngle + (armINCR * (gamepad2.left_stick_y * -1.0)));
 
         if (gamepad2.right_stick_button){
             launcher.fire();
@@ -174,6 +195,7 @@ public class CenterStageTeleOp extends OpMode {
             plunger.extend();
         }
 
+
         /*
         if (gamepad2.y){
             claw.setCosmetic();
@@ -186,6 +208,17 @@ public class CenterStageTeleOp extends OpMode {
         } else if (gamepad2.left_stick_button){
             claw.close();
         } */
+
+        if (!intakeMoveButton.isToggled()){
+            intake.open();
+        } else{
+            intake.close();
+        }
+
+        if (gamepad2.a){
+            setupForPoke();
+        }
+
         slidesTarget = slides.dU.toMm(slides.getTarget());
         if (gamepad2.right_trigger != 0 && (slidesTarget - slidesINCR) >= 0 && slidesDownButton.isChanged(gamepad2.right_trigger != 0)){ //  && slidesDownButton.isChanged(gamepad2.right_trigger != 0))
             slidesTarget -= slidesINCR;
@@ -197,35 +230,18 @@ public class CenterStageTeleOp extends OpMode {
             slides.setTarget(DistanceUnit.MM, 0);
         } else if (gamepad2.b){
             slides.zeroSlides();
+        } else if (gamepad2.y && hangButton.isChanged(gamepad2.y)){
+            slides.setTarget(DistanceUnit.MM, 400);
         }
 
-
-
-        wristANG = wrist.getWristAngle();
-        if (arm.armAngle >= 0) {
-            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) { //  && wristUpButton.isChanged(gamepad2.dpad_up)
-                wristANG += wristINCR;
-            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) { // && wristDownButton.isChanged(gamepad2.dpad_down)
-                wristANG -= wristINCR;
-            }
-        } else {
-            if (gamepad2.dpad_up && wristUpButton.isChanged(gamepad2.dpad_up)) { //  && wristUpButton.isChanged(gamepad2.dpad_up)
-                wristANG -= wristINCR;
-            } else if (gamepad2.dpad_down && wristDownButton.isChanged(gamepad2.dpad_down)) { //  && wristDownButton.isChanged(gamepad2.dpad_down)
-                wristANG += wristINCR;
-            }
+        if (depositModeButton.isChanged(gamepad2.dpad_up) && gamepad2.dpad_up){
+            armAndWrist.setMode(ArmAndWristManager.MODE.PLACING);
+            //armAndWrist.arm.setArmAngle(30.0);
+        } else if (collectModeButton.isChanged(gamepad2.dpad_down) && gamepad2.dpad_down){
+            armAndWrist.setMode(ArmAndWristManager.MODE.FLOOR_FRONT);
+            //armAndWrist.arm.setArmAngle(-105.0);
         }
-        wrist.setWristAngle(wristANG);
 
-
-
-        armANG = arm.armAngle;
-        if (gamepad2.y && armUpButton.isChanged(gamepad2.y)){ // && armUpButton.isChanged(gamepad2.y)
-            armANG += armINCR;
-        } else if (gamepad2.a && armDownButton.isChanged(gamepad2.a)) { // && armDownButton.isChanged(gamepad2.a)
-            armANG -= armINCR;
-        }
-        arm.setArmAngle(armANG);
 
 
         //claw.innerPos = ((gamepad2.left_stick_y + 1) / 2);
@@ -240,39 +256,45 @@ public class CenterStageTeleOp extends OpMode {
 
 
         //claw.update();
-        wrist.update();
-        arm.update();
+
+        updateSubsystems();
+        updateControls();
+
+        //claw.doTelemetry(telemetry);
+        doAllTelemetry();
+        //update call
+        telemetry.update();
+    }
+
+    public void updateSubsystems(){
+        armAndWrist.update();
         slides.update();
         launcher.update();
         plunger.update();
+        intake.update();
         //updates the drive power here
         stick.fieldRelativeMovement(drive, gamepad1, poseEstimate, speed);
+    }
 
-
-
+    public void updateControls(){
         plungerOutButton.update(gamepad2.left_trigger != 0);
         plungerInButton.update(gamepad2.left_bumper);
         slidesDownButton.update(gamepad2.right_trigger != 0);
         slidesUpButton.update(gamepad2.right_bumper);
-        armDownButton.update(gamepad2.a);
-        armUpButton.update(gamepad2.y);
-        wristDownButton.update(gamepad2.dpad_down);
-        wristUpButton.update(gamepad2.dpad_up);
+        depositModeButton.update(gamepad2.dpad_up);
+        collectModeButton.update(gamepad2.dpad_down);
+        intakeMoveButton.update(gamepad1.y);
+        hangButton.update(gamepad2.y);
+    }
 
-
-
-        //claw.doTelemetry(telemetry);
-        wrist.doTelemetry(telemetry);
-        arm.doTelemetry(telemetry);
+    public void doAllTelemetry(){
+        armAndWrist.doTelemetry(telemetry);
         slides.doTelemetry(telemetry);
         launcher.doTelemetry(telemetry);
         plunger.doTelemetry(telemetry);
         intake.doTelemetry(telemetry);
         //drive.doTelemetry() more or less.
         driveTelemetry();
-
-        //update call
-        telemetry.update();
     }
 
     public void stopMovement(){
@@ -297,4 +319,46 @@ public class CenterStageTeleOp extends OpMode {
     //////////////////////////////////////////////////////////////////////////////
     //
     //////////////////////////////////////////////////////////////////////////////
+
+    public void setupForPoke(){
+        if (!intakeMoveButton.isToggled()){
+            intakeMoveButton.update(true);
+        }
+        intake.close();
+
+        plunger.retractFully();
+        intake.update();
+        plunger.update();
+
+        drive.setWeightedDrivePower(new Pose2d(0,0));
+
+        slides.setTarget(DistanceUnit.MM, 260);
+        while (!slides.isAtTarget()){
+            telemetry.addLine("IM IN A LOOP AAAAAA");
+            updateSubsystems();
+        }
+        armAndWrist.setMode(ArmAndWristManager.MODE.POKE);
+
+        int num_iterations = 200;
+        double target = -174;
+        double current_angle = armAndWrist.arm.armAngle;
+        double difference = current_angle - target;
+        double incr = difference/num_iterations;
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+        for (int i = 0; i < num_iterations; i++) {
+            armAndWrist.arm.setArmAngle(current_angle - incr*i);
+            while(time.milliseconds() < 10){
+                time.reset();
+                doAllTelemetry();
+                drive.update();
+            }
+            updateSubsystems();
+        }
+            armAndWrist.update();
+        plunger.extendFully();
+        plunger.update();
+
+    }
+
 }

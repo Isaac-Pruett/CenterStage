@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.Util;
 @DeviceProperties(name = "Adafruit I2c to Neopixel", description = "Adafruit I2c to Neopixel Seesaw Bridge", xmlTag = "I2c_to_Neopixel")
 public class AdafruitNeopixelSeesaw extends I2cDeviceSynchDevice<I2cDeviceSynch> {
 
-    short buffer_length = 3 * 12; // rgb 12 pixel ring. number of bytes needed.
+    public short buffer_length = (3) * 12; // rgb 12 pixel ring. number of bytes needed.
     byte wOffset;
     byte rOffset;
     byte gOffset;
@@ -58,6 +58,10 @@ public class AdafruitNeopixelSeesaw extends I2cDeviceSynchDevice<I2cDeviceSynch>
         init_neopixels();
         this.type = type;
     }
+
+    /**
+     * initializes controller (pin commands, buffer length, speed (pixels))
+     */
     public void init_neopixels(){
         byte[] SPEED_CMD = new byte[2];
         SPEED_CMD[0] = 0x02;
@@ -114,6 +118,9 @@ public class AdafruitNeopixelSeesaw extends I2cDeviceSynchDevice<I2cDeviceSynch>
         write(show_command);
 
     }
+
+
+
     public void writeToNeopixelBuffer(byte[] data){
 
 
@@ -150,6 +157,12 @@ public class AdafruitNeopixelSeesaw extends I2cDeviceSynchDevice<I2cDeviceSynch>
         public final int bVal;
          seesawFunctions(int bVal){
             this.bVal = bVal;
+        }
+    }
+
+    public void clearAllPixels(){
+        for (int i = 0; i < buffer_length / (wOffset == rOffset ? 3 : 4); i++){
+            this.setColor(0, (short) i);
         }
     }
 
