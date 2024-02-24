@@ -20,7 +20,7 @@ public class ArmManager implements subsystem {
         setDirections(Servo.Direction.FORWARD);
     }
 //
-
+//
     @Override
     public void update() {
         double adj = .0212;
