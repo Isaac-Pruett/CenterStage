@@ -326,13 +326,13 @@ public class CenterStageTeleOp extends OpMode {
         }
         intake.close();
 
-        plunger.retractFully();
+        //plunger.retractFully();
         intake.update();
         plunger.update();
 
         drive.setWeightedDrivePower(new Pose2d(0,0));
 
-        slides.setTarget(DistanceUnit.MM, 260);
+        slides.setTarget(DistanceUnit.MM, 312);
         while (!slides.isAtTarget()){
             telemetry.addLine("IM IN A LOOP AAAAAA");
             updateSubsystems();
@@ -340,7 +340,7 @@ public class CenterStageTeleOp extends OpMode {
         armAndWrist.setMode(ArmAndWristManager.MODE.POKE);
 
         int num_iterations = 200;
-        double target = -174;
+        double target = -165;
         double current_angle = armAndWrist.arm.armAngle;
         double difference = current_angle - target;
         double incr = difference/num_iterations;

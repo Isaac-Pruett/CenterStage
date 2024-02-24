@@ -126,7 +126,7 @@ public class ArmAndWristManager implements subsystem {
             }
             */
         } else if (currentMode == MODE.POKE) {
-            return theta - 285.0;
+            return theta - 290.0;
 
         } else{
             return wrist.getWristAngle();

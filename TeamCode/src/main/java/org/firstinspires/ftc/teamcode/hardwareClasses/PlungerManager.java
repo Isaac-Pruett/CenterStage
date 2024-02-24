@@ -16,9 +16,11 @@ public class PlungerManager implements subsystem {
         actuator = hwmp.get(Servo.class, "plunger");
     }
     public void retractFully(){
+        current = retracted;
         actuator.setPosition(retracted);
     }
     public void extendFully(){
+        current = extended;
         actuator.setPosition(extended);
     }
     public void extend(){
