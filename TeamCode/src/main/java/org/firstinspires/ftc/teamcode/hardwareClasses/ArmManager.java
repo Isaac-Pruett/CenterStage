@@ -19,7 +19,7 @@ public class ArmManager implements subsystem {
 
         setDirections(Servo.Direction.FORWARD);
     }
-
+//
 
     @Override
     public void update() {
